@@ -1,14 +1,17 @@
-const ethers = require('ethers');
+const { assert } = require('chai');
+const deposit = require('../index');
 
-/**
- * Deposit at least 1 ether into the contract 
- *
- * @param {ethers.Contract} contract - ethers.js contract instance
- * @return {promise} a promise of the deposit transaction 
- */
-async function deposit(contract) {
-    contract.deposit({value: ethers.utils.parseEther("5")});
-    
-}
+describe('Contract', function () {
+    let contract;
+    before(async () => {
+        const Contract = await ethers.getContractFactory("Contract");
+        contract = await Contract.deploy();
+        await contract.deployed();
+    });
 
-module.exports = deposit;
+    it('should deposit at least 1 ether', async () => {
+        await deposit(contract);
+        const balance = await ethers.provider.getBalance(contract.address);
+        assert(balance.gte(ethers.utils.parseEther("1")));
+    });
+});
